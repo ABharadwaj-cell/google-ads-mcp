@@ -48,6 +48,9 @@ def search(
 
     """
 
+    if limit is not None and (type(limit) is not int or limit <= 0):
+        raise ToolError("limit must be a positive integer")
+
     customer_id = utils.clean_customer_id(customer_id)
 
     ga_service = utils.get_googleads_service(
@@ -62,7 +65,7 @@ def search(
     if orderings:
         query_parts.append(f" ORDER BY {','.join(orderings)}")
 
-    if limit:
+    if limit is not None:
         query_parts.append(f" LIMIT {limit}")
 
     query_parts.append(" PARAMETERS omit_unselected_resource_names=true")
