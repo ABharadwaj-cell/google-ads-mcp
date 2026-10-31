@@ -151,6 +151,24 @@ class TestSearch(unittest.TestCase):
             query="SELECT campaign.id FROM campaign PARAMETERS omit_unselected_resource_names=true",
         )
 
+    @patch("ads_mcp.utils.get_googleads_service")
+    def test_search_rejects_invalid_limits_before_api_call(self, mock_get_service):
+        """Reject invalid GAQL limits without opening an API connection."""
+        from fastmcp.exceptions import ToolError
+
+        for invalid_limit in (0, -1, True, False, "10", 1.5):
+            with self.subTest(limit=invalid_limit):
+                with self.assertRaisesRegex(
+                    ToolError, "limit must be a positive integer"
+                ):
+                    search.search(
+                        customer_id="1234567890",
+                        fields=["campaign.id"],
+                        resource="campaign",
+                        limit=invalid_limit,
+                    )
+        mock_get_service.assert_not_called()
+
     def test_search_tool_description(self):
         """Tests that the tool description is generated correctly."""
         # Mocking open as if the file exists
