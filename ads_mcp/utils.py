@@ -17,6 +17,7 @@
 """Common utilities used by the MCP server."""
 
 from typing import Any
+from collections.abc import Mapping
 import proto
 from google.protobuf.message import Message as PbMessage
 from google.protobuf.json_format import MessageToDict
@@ -157,6 +158,8 @@ def format_output_value(value: Any) -> Any:
         return proto.Message.to_dict(value)
     elif isinstance(value, PbMessage):
         return MessageToDict(value, preserving_proto_field_name=True)
+    elif isinstance(value, Mapping):
+        return {key: format_output_value(item) for key, item in value.items()}
     elif hasattr(value, "__iter__") and not isinstance(value, (str, bytes)):
         return [format_output_value(v) for v in value]
     else:
