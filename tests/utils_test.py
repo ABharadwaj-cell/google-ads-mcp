@@ -50,6 +50,17 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(formatted.get("clicks"), "10")
         self.assertEqual(formatted.get("impressions"), "100")
 
+    def test_format_output_value_mapping_preserves_keys_and_formats_values(self):
+        """Mappings retain their keys while nested Google Ads values are formatted."""
+        value = {
+            "campaign": CampaignStatusEnum.CampaignStatus.ENABLED,
+            "nested": {"clicks": [1, 2]},
+        }
+        self.assertEqual(
+            utils.format_output_value(value),
+            {"campaign": "ENABLED", "nested": {"clicks": [1, 2]}},
+        )
+
     def test_format_output_value_repeated_primitive(self):
         """Tests that repeated primitive values are formatted."""
         self.assertEqual(
